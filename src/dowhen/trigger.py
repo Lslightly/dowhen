@@ -200,7 +200,10 @@ class Trigger:
                 return eval(self.condition, frame.f_globals, frame.f_locals)
             elif callable(self.condition):
                 return call_in_frame(self.condition, frame)
-        except Exception:
+        except (
+            Exception
+        ) as e:  # TODO more user-friendly hints instead of failing silently
+            print(e)
             return False
 
         assert False, "Unknown condition type"  # pragma: no cover

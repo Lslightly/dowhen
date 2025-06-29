@@ -122,6 +122,11 @@ You can add conditions to triggers to make them more specific:
 
 You can also use a function as a condition:
 
+.. note::
+
+    If the function has a decorator, the decorator should keep the signature of decorated function.
+    You can use `decorator package <https://pypi.org/project/decorator/>`_ to keep the signature.
+
 .. code-block:: python
 
    from dowhen import when
@@ -158,6 +163,25 @@ If the condition function returns ``dowhen.DISABLE``, the trigger will not fire 
    assert f(0) == 1  # x is set to 1 when x is 0
    assert f(2) == 2  # x is not modified and the trigger is disabled
    assert f(0) == 0  # x is not modified anymore
+
+You can also use the ``true_guarded_by`` decorator to wrap a condition function, so that the condition only takes effect after it has been satisfied a certain number of times.
+
+.. code-block:: python
+
+   from dowhen import when
+   from dowhen.decorators import true_guarded_by
+
+   def f(x):
+       return x
+
+   @true_guarded_by(lambda count: count > 1)
+   def check(x):
+       return x == 0
+
+   when(f, "return x", condition=check).do("x = 1")
+   assert f(0) == 0 # x = 1 is not executed because count is 1
+   assert f(0) == 1 # x is set to 1 because count is 2
+
 
 Source Hash
 ^^^^^^^^^^^
@@ -201,6 +225,12 @@ Callbacks
 
 If you are using a function for ``do``, the local variables that match the function arguments
 will be automatically passed to the function.
+
+.. note::
+
+    If the function has a decorator, the decorator should keep the signature of decorated function.
+    You can use `decorator package <https://pypi.org/project/decorator/>`_ to keep the signature.
+
 
 Special arguments:
 
